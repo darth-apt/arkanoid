@@ -1,8 +1,15 @@
+# music: Frozen Jam by tgfcoder <https://twitter.com/tgfcoder> licensed under CC-BY-3 <http://creativecommons.org/licenses/by/3.0/>
+
 import pygame
 from random import randrange as rnd
+import time
 
 WIDTH, HEIGHT = 1200, 800
 fps = 60
+
+# data collecting
+bricks_counter = 0
+
 # paddle settings
 paddle_w = 330
 paddle_h = 35
@@ -19,6 +26,16 @@ block_list = [pygame.Rect(10 + 120 * i, 10 + 70 * j, 100, 50) for i in range(10)
 color_list = [(rnd(30, 256), rnd(30, 256), rnd(30, 256)) for i in range(10) for j in range(4)]
 
 pygame.init()
+
+# music
+pygame.mixer.music.load('snd\\tgfcoder-FrozenJam-SeamlessLoop.ogg')
+pygame.mixer.music.set_volume(0.2)
+pygame.mixer.music.play()
+# sounds
+sound1 = pygame.mixer.Sound('snd\\ping_pong_8bit_beeep.ogg')
+sound2 = pygame.mixer.Sound('snd\\ping_pong_8bit_plop.ogg')
+sound3 = pygame.mixer.Sound('snd\\applause.wav')
+
 sc = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 # background image
@@ -59,16 +76,16 @@ while True:
     # collision left right
     if ball.centerx < ball_radius or ball.centerx > WIDTH - ball_radius:
         dx = -dx
+        sound1.play()
     # collision top
     if ball.centery < ball_radius:
         dy = -dy
+        sound1.play()
     # collision paddle
     if ball.colliderect(paddle) and dy > 0:
         dx, dy = detect_collision(dx, dy, ball, paddle)
-        # if dx > 0:
-        #     dx, dy = (-dx, -dy) if ball.centerx < paddle.centerx else (dx, -dy)
-        # else:
-        #     dx, dy = (-dx, -dy) if ball.centerx >= paddle.centerx else (dx, -dy)
+        sound1.play()
+
     # collision blocks
     hit_index = ball.collidelist(block_list)
     if hit_index != -1:
@@ -79,12 +96,21 @@ while True:
         hit_rect.inflate_ip(ball.width * 3, ball.height * 3)
         pygame.draw.rect(sc, hit_color, hit_rect)
         fps += 2
+        sound2.play()
+        bricks_counter = bricks_counter + 1
+
     # win, game over
     if ball.bottom > HEIGHT:
-        print('GAME OVER!')
+        print('GAME OVER!  Your score is: ' + str(bricks_counter))
+        pygame.mixer.music.stop()
+        sound3.play()
+        time.sleep(6)
         exit(0)
     elif not len(block_list):
         print('WIN!!!')
+        pygame.mixer.music.stop()
+        sound3.play()
+        time.sleep(6)
         exit(0)
     # control
     key = pygame.key.get_pressed()
