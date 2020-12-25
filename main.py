@@ -1,6 +1,7 @@
 # music: Frozen Jam by tgfcoder <https://twitter.com/tgfcoder> licensed under CC-BY-3 <http://creativecommons.org/licenses/by/3.0/>
 
 import pygame
+from pygame.locals import *
 from random import randrange as rnd
 import time
 
@@ -31,6 +32,7 @@ pygame.init()
 pygame.mixer.music.load('snd\\tgfcoder-FrozenJam-SeamlessLoop.ogg')
 pygame.mixer.music.set_volume(0.2)
 pygame.mixer.music.play()
+
 # sounds
 sound1 = pygame.mixer.Sound('snd\\ping_pong_8bit_beeep.ogg')
 sound2 = pygame.mixer.Sound('snd\\ping_pong_8bit_plop.ogg')
@@ -38,9 +40,9 @@ sound3 = pygame.mixer.Sound('snd\\applause.wav')
 
 sc = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
+
 # background image
 img = pygame.image.load('1.jpg').convert()
-
 
 def detect_collision(dx, dy, ball, rect):
     if dx > 0:
@@ -113,11 +115,19 @@ while True:
         time.sleep(6)
         exit(0)
     # control
+    ## keyboard
     key = pygame.key.get_pressed()
     if key[pygame.K_LEFT] and paddle.left > 0:
         paddle.left -= paddle_speed
     if key[pygame.K_RIGHT] and paddle.right < WIDTH:
         paddle.right += paddle_speed
+    
+    ## mouse
+  
+    if event.type == pygame.MOUSEMOTION:
+        delta_x, delta_y = pygame.mouse.get_rel()
+        paddle.left += (delta_x * 4)
+    
     # update screen
     pygame.display.flip()
     clock.tick(fps)
